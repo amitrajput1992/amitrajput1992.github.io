@@ -1,0 +1,4 @@
+.storybook/**/*.css
+.storybook/**/*.html
+**/base-compiled.scss
+**/i.scss
