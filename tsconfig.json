@@ -1,30 +1,17 @@
 {
+  "include": ["src", "types"],
+  "exclude": ["node_modules"],
+  "extends": "@snowpack/app-scripts-react/tsconfig.base.json",
   "compilerOptions": {
-    // Target latest version of ECMAScript.
-    "target": "esnext",
-    // Search under node_modules for non-relative imports.
-    "moduleResolution": "node",
-    // Process & infer types from .js files.
-    "allowJs": false,
-    // Don't emit; allow Babel to transform files.
-    "noEmit": true,
-    // Enable strictest settings like strictNullChecks & noImplicitAny.
-    "strict": true,
-    // Disallow features that require cross-file information for emit.
-    "isolatedModules": false,
-    // Import non-ES modules as default imports.
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    // allow jsx syntax
-    "jsx": "react",
-    "rootDirs": [
-      "stories",
-      "src"
-    ]
-  },
-  "include": [
-    "stories/**/*",
-    "src/**/*"
-  ],
-  "exclude": ["lib"]
+    // You can't currently define paths in your 'extends' config,
+    // so we have to set 'baseUrl' & 'paths' here.
+    // Don't change these unless you know what you're doing.
+    // See: https://github.com/microsoft/TypeScript/issues/25430
+    "baseUrl": "./",
+    /* more strict checking for errors that per-file transpilers like `esbuild` would crash */
+    "isolatedModules": true,
+    "paths": { "*": ["web_modules/.types/*"] }
+    // Feel free to add/edit new config options below:
+    // ...
+  }
 }
