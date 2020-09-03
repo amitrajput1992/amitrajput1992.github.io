@@ -1,6 +1,8 @@
 {
   "extends": "@snowpack/app-scripts-react",
-  "plugins": [],
+  "plugins": [
+    ["snowpack-plugin-sass"]
+  ],
   "devOptions": {
     "open": "none"
   }
