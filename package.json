@@ -1,8 +1,7 @@
 {
   "scripts": {
     "start": "snowpack dev --reload",
-    "clean": "rm -rf build",
-    "build": "pnpm clean && snowpack build",
+    "build": "rm -rf build && snowpack build",
     "test": "jest",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\""
