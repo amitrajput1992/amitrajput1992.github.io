@@ -8,9 +8,9 @@ node_js:
 #  directories:
 #   - node_modules
 install:
-  - pnpm install
+  - yarn install
 script:
-  - pnpm build
+  - yarn build
 deploy:
   provider: pages
   skip_cleanup: true
