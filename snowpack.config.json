@@ -2,14 +2,17 @@
   "extends": "@snowpack/app-scripts-react",
   "plugins": [
     [
-      "snowpack-plugin-sass",
-      "@snowpack/plugin-webpack"
-    ]
+      "@snowpack/plugin-webpack", {
+        "outputPattern": {"css": "[name].bundle.css", "js": "[name].bundle.js", "assets": "[name]"}
+      }
+    ],
+    "snowpack-plugin-sass"
   ],
   "devOptions": {
     "open": "none"
   },
   "buildOptions": {
+    "clean": true,
     "metaDir": "static/snowpack"
   },
   "mount": {
