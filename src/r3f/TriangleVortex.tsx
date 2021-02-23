@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useFrame, useThree, PointerEvent} from 'react-three-fiber';
 import {
   Vector2,
-  Geometry,
+  BufferGeometry,
   Vector3,
   CatmullRomCurve3,
   Line,
@@ -12,7 +12,7 @@ import {
   TubeGeometry,
   Color,
   Fog,
-  Euler, Mesh
+  Euler, Mesh, BufferAttribute
 } from 'three';
 // @ts-ignore
 import perlin from '../vendor/perlin';
@@ -48,45 +48,59 @@ export default function TriangleVortex() {
   points[4].y = -0.06;// todo check why?
   const curve = new CatmullRomCurve3(points);
   curve.type = 'catmullrom';
-
-  const geometry = new Geometry();
-  geometry.vertices = curve.getPoints(120);
-  const splineMesh = new Line(geometry, new LineBasicMaterial())
+  const curvePoints = curve.getPoints(120);
+  const geometry = new BufferGeometry().setFromPoints(curvePoints);
+  const splineMesh = new Line(geometry, new LineBasicMaterial());
 
   const tubeMaterial = new MeshBasicMaterial({
     side: BackSide,
-    vertexColors: true
+    vertexColors: true,
+    // color: "#FFF"
   });
 
-  const tubeGeometry = new TubeGeometry(curve, 120, 0.08, 3, false);
+  const tubeGeometryIndexed = new TubeGeometry(curve, 120, 0.08, 3, false);
+  const tubeGeometry = tubeGeometryIndexed.toNonIndexed();
 
-  for (let i = 0; i < tubeGeometry.faces.length; i++) {
-    const face = tubeGeometry.faces[i];
-    const point = tubeGeometry.vertices[face.a];
+  const positions = tubeGeometry.getAttribute("position");
+  const c = new BufferAttribute(new Float32Array(positions.count * 3), 3);
+  tubeGeometry.setAttribute("color", c);
+  const colors = tubeGeometry.getAttribute("color");
+
+  // each position points to a vertex(vec3). A face is made by joining 3 vertices, the face takes the colors applied to all the vertices that compute it.
+  // here we apply the same color to all the 3 vertices of the face to uniform out the color impact.
+  for (let i = 0; i < positions.count; i = i + 3) {
     const color = new Color(
       `hsl(${
         (Math.floor(
-          Math.abs(perlin.simplex3(point.x * 2, point.y * 4, point.z * 2)) * 80 * 100
+          Math.abs(perlin.simplex3(positions.getX(i) * 2, positions.getY(i) * 4, positions.getZ(i) * 2)) * 80 * 100
         ) * 0.01 + 180)
-      }, 70%, 60%)`
+      }, 70%, 45%)`
     );
-    face.color = color;
+    colors.setXYZ(i + 0, color.r, color.g, color.b);
+    colors.setXYZ(i + 1, color.r, color.g, color.b);
+    colors.setXYZ(i + 2, color.r, color.g, color.b);
   }
+  tubeGeometry.attributes.color.needsUpdate = true;
 
   const tubeGeometryOriginal = tubeGeometry.clone();
+  const splineVertices = splineMesh.geometry.getAttribute("position");
+  const tubeOriginalVertices = tubeGeometryOriginal.getAttribute("position");
 
   function update(delta: number) {
-    let verticeOriginal;
-    let vertice;
-    for (let i = 0; i < tubeGeometry.vertices.length; i++) {
-      vertice = tubeGeometry.vertices[i];
-      verticeOriginal = tubeGeometryOriginal.vertices[i];
+    const tubeVertices = tubeGeometry.getAttribute("position");
+    for (let i = 0; i < tubeVertices.count; i++) {
+      let x = tubeVertices.getX(i);
+      let y = tubeVertices.getY(i);
+      let z = tubeVertices.getZ(i);
+
       const index = Math.floor(i / 120);
-      vertice.x += ((verticeOriginal.x + splineMesh.geometry.vertices[index].x) - vertice.x) / 15;
-      vertice.y += ((verticeOriginal.y + splineMesh.geometry.vertices[index].y) - vertice.y) / 15;
-      vertice.applyAxisAngle(new Vector3(0, 0, -1), Math.abs(Math.cos(delta * 0.001 + vertice.z * 5)) * 0.03);
+      x += ((tubeOriginalVertices.getX(i) + splineVertices.getX(index)) - x) / 15;
+      y += ((tubeOriginalVertices.getY(i) + splineVertices.getY(index)) - y) / 15;
+      const vec3 = new Vector3(x, y, z).applyAxisAngle(new Vector3(0, 0, 1), Math.abs(Math.cos(delta * 0.001 + z * 5)) * 0.05);
+      tubeVertices.setX(i, vec3.x);
+      tubeVertices.setY(i, vec3.y);
     }
-    tubeGeometry.verticesNeedUpdate = true;
+    tubeGeometry.attributes.position.needsUpdate = true;
 
     curve.points[2].x = 100 * (1 - mouse.current.ratio.x) - 50;
     curve.points[4].x = 100 * (1 - mouse.current.ratio.x) - 50;
@@ -94,19 +108,23 @@ export default function TriangleVortex() {
     curve.points[2].y = 100 * (1 - mouse.current.ratio.y) - 50;
     curve.points[4].y = 100 * (1 - mouse.current.ratio.y) - 50;
 
-    splineMesh.geometry.verticesNeedUpdate = true;
-    splineMesh.geometry.vertices = curve.getPoints(120);
+    splineMesh.geometry.attributes.position.needsUpdate = true;
+    splineMesh.geometry.setFromPoints(curve.getPoints(120));
 
     delta *= 0.0003;
-    let f, p, h, rgb;
-    for (let i = 0; i < tubeGeometry.faces.length; i++) {
-      f = tubeGeometry.faces[i];
-      p = tubeGeometry.vertices[f.a];
-      h = (Math.floor(Math.abs(perlin.simplex3(p.x * 2, p.y * 4, p.z * 2 + delta)) * 80 * 100) * 0.01 + 180) / 360;
-      rgb = hslToRgb(h, 0.7, 0.6)
-      f.color = new Color(rgb[0], rgb[1], rgb[2]);
+    let h, rgb;
+    for (let i = 0; i < tubeVertices.count; i = i + 3) {
+      const vx = tubeVertices.getX(i);
+      const vy = tubeVertices.getY(i);
+      const vz = tubeVertices.getZ(i);
+      h = (Math.floor(Math.abs(perlin.simplex3(vx * 2, vy * 4, vz * 2 + delta)) * 80 * 100) * 0.01 + 180) / 360;
+      rgb = hslToRgb(h, 0.7, 0.45)
+      const color = new Color(rgb[0], rgb[1], rgb[2]);
+      colors.setXYZ(i + 0, color.r, color.g, color.b);
+      colors.setXYZ(i + 1, color.r, color.g, color.b);
+      colors.setXYZ(i + 2, color.r, color.g, color.b);
     }
-    tubeGeometry.elementsNeedUpdate = true;
+    tubeGeometry.attributes.color.needsUpdate = true;
   }
 
   function onPointerMove(e: PointerEvent) {

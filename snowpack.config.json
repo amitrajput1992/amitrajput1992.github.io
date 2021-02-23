@@ -13,7 +13,7 @@
   },
   "buildOptions": {
     "clean": true,
-    "metaDir": "static/snowpack"
+    "metaUrlPath": "static/snowpack"
   },
   "mount": {
     "src": "/dist"
