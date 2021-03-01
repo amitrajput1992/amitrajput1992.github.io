@@ -1,34 +1,30 @@
 import React from 'react';
-import { Canvas } from 'react-three-fiber';
+import {HashRouter, Switch, Route} from "react-router-dom";
+import Home from "../src/apps/Home";
+import CrossFade from "../src/apps/CrossFade";
+
 import 'bootstrap/dist/css/bootstrap-reboot.min.css';
 import './App.scss';
-
-import PerspectiveCamera from "./r3f/PerspectiveCamera";
-import TriangleVortex from "./r3f/TriangleVortex";
-import Stats from "./r3f/Stats";
-import Horse from './Icons/Horse';
 
 interface AppProps {}
 
 function App({}: AppProps) {
   return (
     <>
-      <div className={'html_root'}>
-        <div className={'hmh'}>
-          Hold my horses <Horse/>
-        </div>
-      </div>
-      <Canvas className={'canvas'}>
-        <ambientLight />
-        <pointLight position={[10, 10, 10]} />
-        <PerspectiveCamera />
-        <TriangleVortex />
-        <Stats />
-        <mesh position={[0, 5, -10]} rotation={[0, 0, 0]} castShadow>
-          <dodecahedronBufferGeometry attach="geometry" args={[1.4, 0]}/>
-          <meshNormalMaterial attach="material"/>
-        </mesh>
-      </Canvas>
+      <HashRouter>
+        <Switch>
+          <Route exact path={"/home"}>
+            <Home/>
+          </Route>
+          <Route exact path={"/crossfade"}>
+            <CrossFade/>
+          </Route>
+          <Route exact path={"/"}>
+            <Home/>
+          </Route>
+
+        </Switch>
+      </HashRouter>
     </>
   );
 }
