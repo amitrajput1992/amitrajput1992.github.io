@@ -22,12 +22,13 @@ export default function CrossFade() {
         <Transition
           scene1={
             <Suspense fallback={null}>
-              <PanoImage source={"https://s.gmetri.com/gb-web/r3f-ui/assets/pano/livingRoom_001.jpg"}/>
+              <PanoImage source={"https://gb-web.s3.ap-south-1.amazonaws.com/r3f-ui/assets/pano/livingRoom_001.jpg"}/>
+              {/*<PanoImage source={"https://s.gmetri.com/gb-web/r3f-ui/assets/pano/livingRoom_001.jpg"}/>*/}
             </Suspense>
           }
           scene2={
             <Suspense fallback={null}>
-              <PanoImage source={"https://u.gmetri.com/gb-sms-prod-1/media/2021-1/gmetri/b0b542de-5035-45c3-bdc5-28038869b264/o/360_berry_brothers_and%20_rudd_shop.jpg"}/>
+              <PanoImage source={"https://gb-sms-prod-1.s3.ap-south-1.amazonaws.com/media/2021-1/gmetri/b0b542de-5035-45c3-bdc5-28038869b264/o/360_berry_brothers_and%20_rudd_shop.jpg"}/>
             </Suspense>
           }/>
         <MousePanControls/>

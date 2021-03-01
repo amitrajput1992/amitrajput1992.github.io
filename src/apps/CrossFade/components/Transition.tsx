@@ -26,7 +26,7 @@ const renderTargetParameters = {
   format: RGBAFormat
 };
 
-const speed = 4.0;
+const speed = 2.0;
 
 export function Transition({scene1, scene2}: Props) {
   const scene = useRef<Scene>(new Scene());
@@ -39,29 +39,11 @@ export function Transition({scene1, scene2}: Props) {
   const [rttScene2, setRttScene2] = useState(true);
   const camera = useRef<PerspectiveCamera>(new PerspectiveCamera());
 
-  const scene1Ref = useRef();
-  const scene2Ref = useRef();
-
-  /**
-   * 1. Render the current scene and the incoming scene into resp FBOs
-   * 2. Render the texture to transition scene
-   * 3. Start animation
-   * 4. After animation is complete, dispose off previous scene and clear transition buffers
-   **/
-  function transition() {
-
-  }
-
   useEffect(() => {
     //@ts-ignore
     planeMesh.current.material.uniforms.tDiffuse1.value = fboScene1.texture;
     //@ts-ignore
     planeMesh.current.material.uniforms.tDiffuse2.value = fboScene2.texture;
-
-    // eventEmitter.on(events.transition, transition);
-    // return () => {
-    //   eventEmitter.off(events.transition, transition);
-    // }
   }, []);
 
   const shaderArgs = useMemo(() => {
@@ -102,20 +84,20 @@ export function Transition({scene1, scene2}: Props) {
     const delta = clock.getElapsedTime();
     const t = (1 + Math.sin(speed * delta / Math.PI)) / 2;
     const transition = MathUtils.smootherstep(t, 0.3, 0.7);
-    // setTransitionValue(transition);
+    setTransitionValue(transition);
     //@ts-ignore
-    planeMesh.current.material.uniforms.mixRatio.value = transition;
+    // planeMesh.current.material.uniforms.mixRatio.value = transition;
     // Prevent render both scenes when it's not necessary
     if(transition === 0) {
       //@ts-ignore
       // scene2Ref.current?.render(false);
       setRttScene2(false);
-      // setRttScene1(true);
+      setRttScene1(true);
     } else if(transition === 1) {
       //@ts-ignore
       // scene1Ref.current?.render(false);
       setRttScene1(false);
-      // setRttScene2(true);
+      setRttScene2(true);
     } else {
       // When 0<transition<1 render transition between two scenes
       //@ts-ignore

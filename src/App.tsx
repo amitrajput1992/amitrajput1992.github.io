@@ -22,7 +22,6 @@ function App({}: AppProps) {
           <Route exact path={"/"}>
             <Home/>
           </Route>
-
         </Switch>
       </HashRouter>
     </>
