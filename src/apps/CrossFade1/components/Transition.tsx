@@ -25,7 +25,7 @@ const renderTargetParameters = {
   format: RGBAFormat
 };
 
-const speed = 1.0;
+const speed = 2.0;
 
 export function Transition({scene1, scene2}: Props) {
   const scene = useRef<Scene>(new Scene());
@@ -47,7 +47,7 @@ export function Transition({scene1, scene2}: Props) {
 
   const shaderArgs = useMemo(() => {
     const loader = new TextureLoader();
-    const mixT = loader.load("https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/transition/transition1.png");
+    const mixT = loader.load("https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/transition/transition3.png");
     // const dif1 = loader.load("https://s.gmetri.com/gb-web/r3f-ui/assets/pano/livingRoom_001.jpg");
     // const dif2 = loader.load("https://u.gmetri.com/gb-sms-prod-1/media/2021-1/gmetri/b0b542de-5035-45c3-bdc5-28038869b264/o/360_berry_brothers_and%20_rudd_shop.jpg");
     // const mixT = loader.load("https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/transition/transition2.png");

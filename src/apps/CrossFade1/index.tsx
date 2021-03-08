@@ -5,13 +5,18 @@ import { PanoImage } from "../../r3f/Pano";
 import Stats from "../../r3f/Stats";
 import { MousePanControls } from "../../r3f/controls/MousePanControls";
 import "./index.scss";
-import { Transition } from "./components/Transition";
+import { Exp } from "./components/Exp";
+import {events, eventEmitter} from "./helper";
 
 // https://u.gmetri.com/gb-sms-prod-1/media/2021-1/gmetri/b0b542de-5035-45c3-bdc5-28038869b264/o/360_berry_brothers_and%20_rudd_shop.jpg
 // https://s.gmetri.com/gb-web/r3f-ui/assets/pano/livingRoom_001.jpg
 export default function CrossFade() {
+  function onClick() {
+    eventEmitter.emit(events.transition);
+  }
   return (
     <>
+      <button onClick={onClick} style={{position: "absolute", left: "50%", zIndex: 1}}>TRANSIOOOOOO BRUH</button>
       <Canvas
         colorManagement={false}
         className={'canvas'}
@@ -19,17 +24,7 @@ export default function CrossFade() {
         <ambientLight />
         <pointLight position={[10, 10, 10]} />
         <PerspectiveCamera />
-        <Transition
-          scene1={
-            <Suspense fallback={null}>
-              <PanoImage source={"https://s.gmetri.com/gb-web/r3f-ui/assets/pano/livingRoom_001.jpg"}/>
-            </Suspense>
-          }
-          scene2={
-            <Suspense fallback={null}>
-              <PanoImage source={"https://u.gmetri.com/gb-sms-prod-1/media/2021-1/gmetri/b0b542de-5035-45c3-bdc5-28038869b264/o/360_berry_brothers_and%20_rudd_shop.jpg"}/>
-            </Suspense>
-          }/>
+        <Exp />
         <MousePanControls/>
         <Stats />
       </Canvas>
